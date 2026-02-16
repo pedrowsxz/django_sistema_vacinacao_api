@@ -5,7 +5,7 @@ from datetime import date
 
 class VaccinationRecordMinimalSerializer(serializers.ModelSerializer):
     """
-    Minimal vaccination record for nested representations.
+    Registro de vacinação para representações aninhadas.
     """
     pet_name = serializers.CharField(source='pet.name', read_only=True)
     vaccine_name = serializers.CharField(source='vaccine.name', read_only=True)
@@ -23,7 +23,7 @@ class VaccinationRecordMinimalSerializer(serializers.ModelSerializer):
 
 class VaccinationRecordSerializer(serializers.ModelSerializer):
     """
-    Standard serializer for VaccinationRecord operations.
+    Serializer padrão para operações de VaccinationRecord.
     """
     pet_name = serializers.CharField(source='pet.name', read_only=True)
     vaccine_name = serializers.CharField(source='vaccine.name', read_only=True)
@@ -53,15 +53,15 @@ class VaccinationRecordSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'next_dose_date']
     
     def validate_administered_date(self, value):
-        """Ensure administered date is not in the future"""
+        """Garantir que a data de vacinação não seja futura"""
         if value > date.today():
-            raise serializers.ValidationError("Vaccination date cannot be in the future.")
+            raise serializers.ValidationError("A data da vacinação não pode estar no futuro.")
         return value
     
     def validate(self, data):
         """
-        Cross-field validation:
-        - Ensure vaccination date is after pet's birth date
+        Validação cruzada entre campos:
+        - Garantir que a data da vacinação seja após a data de nascimento do pet
         """
         pet = data.get('pet')
         administered_date = data.get('administered_date')
@@ -69,7 +69,7 @@ class VaccinationRecordSerializer(serializers.ModelSerializer):
         if pet and administered_date:
             if administered_date < pet.birth_date:
                 raise serializers.ValidationError({
-                    'administered_date': "Vaccination date cannot be before pet's birth date."
+                    'administered_date': "A data da vacinação não pode ser anterior à data de nascimento do pet."
                 })
         
         return data
@@ -77,7 +77,7 @@ class VaccinationRecordSerializer(serializers.ModelSerializer):
 
 class VaccinationRecordDetailSerializer(VaccinationRecordSerializer):
     """
-    Detailed serializer with full pet and vaccine information.
+    Serializer detalhado com informações completas do pet e da vacina.
     """
     pet = serializers.SerializerMethodField()
     vaccine = serializers.SerializerMethodField()
@@ -86,7 +86,7 @@ class VaccinationRecordDetailSerializer(VaccinationRecordSerializer):
         fields = VaccinationRecordSerializer.Meta.fields + ['updated_at']
     
     def get_pet(self, obj):
-        """Return pet details"""
+        """Retornar detalhes do pet"""
         return {
             'id': obj.pet.id,
             'name': obj.pet.name,
@@ -96,7 +96,7 @@ class VaccinationRecordDetailSerializer(VaccinationRecordSerializer):
         }
     
     def get_vaccine(self, obj):
-        """Return vaccine details"""
+        """Retornar detalhes da vacina"""
         return {
             'id': obj.vaccine.id,
             'name': obj.vaccine.name,

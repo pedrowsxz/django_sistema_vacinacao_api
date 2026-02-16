@@ -147,6 +147,8 @@ Inicialmente considerei montar um app separado para cada model, mas concluí que
 - Mais fácil de manter neste escopo
 - Segue o princípio do Django de "apps devem ser reutilizáveis" — este domínio é coeso
 
+---
+
 ### Autenticação por Token
 Para autenticação, optei por utilizar o Token Authentication nativo do DRF, a alternativa JWT adicionaria complexidade sem benefício significativo.
 
@@ -251,6 +253,8 @@ GET    /api/vaccinations/recent/    → core/views/vaccination_record.py → Vac
 ```
 
 ## Modelos e Propriedades
+
+Decidi nomear as propriedades e os models em inglês, pois achei que melhor contextualiza com os termos da sintaxe do django. Apenas traduzi o modelo 'Pessoa'
 
 ### 1. Pessoa
 Representa um dono de pet, vinculado ao modelo `User` do Django.

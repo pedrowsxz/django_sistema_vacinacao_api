@@ -5,31 +5,31 @@ from django.core.validators import EmailValidator, RegexValidator
 
 class Pessoa(models.Model):
     """
-    Represents a pet owner.
-    Linked to Django's User model for authentication.
+    Representa o dono de pets.
+    Vinculado ao modelo User do Django para autenticação.
     """
     user = models.OneToOneField(
         User, 
         on_delete=models.CASCADE, 
         related_name='pessoa',
-        help_text="Associated user account"
+        help_text="Conta de usuário associada"
     )
     name = models.CharField(max_length=150)
     email = models.EmailField(
         unique=True,
         validators=[EmailValidator()],
-        help_text="Contact email"
+        help_text="Email para contato"
     )
     phone = models.CharField(
         max_length=20,
         validators=[
             RegexValidator(
                 regex=r'^\+?1?\d{9,15}$',
-                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
+                message="Número de telefone deve ser inserido no formato: '+999999999'. Até 15 dígitos permitidos."
             )
         ],
         blank=True,
-        help_text="Contact phone number"
+        help_text="Número de telefone para contato"
     )
     address = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -45,5 +45,5 @@ class Pessoa(models.Model):
     
     @property
     def total_pets(self):
-        """Return the total number of pets owned"""
+        """Retorna o número total de pets desta pessoa"""
         return self.pets.count()

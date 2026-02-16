@@ -4,7 +4,7 @@ from core.models import Vaccine
 
 class VaccineSerializer(serializers.ModelSerializer):
     """
-    Standard serializer for Vaccine operations.
+    Serializer padrão para operações com Vaccine.
     """
     total_administrations = serializers.SerializerMethodField()
     
@@ -24,19 +24,19 @@ class VaccineSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at']
     
     def get_total_administrations(self, obj):
-        """Count how many times this vaccine has been administered"""
+        """Contar quantas vezes esta vacina foi administrada"""
         return obj.vaccination_records.count()
     
     def validate_duration_months(self, value):
-        """Ensure duration is positive"""
+        """Garantir que a duração seja positiva"""
         if value < 1:
-            raise serializers.ValidationError("Duration must be at least 1 month.")
+            raise serializers.ValidationError("A duração deve ser pelo menos 1 mês.")
         return value
 
 
 class VaccineDetailSerializer(VaccineSerializer):
     """
-    Detailed serializer with recent administrations.
+    Serializer detalhado com administrações recentes.
     """
     recent_administrations = serializers.SerializerMethodField()
     
@@ -44,7 +44,7 @@ class VaccineDetailSerializer(VaccineSerializer):
         fields = VaccineSerializer.Meta.fields + ['recent_administrations', 'updated_at']
     
     def get_recent_administrations(self, obj):
-        """Return recent vaccination records using this vaccine"""
+        """Retornar registros recentes de vacinação usando esta vacina"""
         from core.serializers.vaccination_record import VaccinationRecordMinimalSerializer
         records = obj.vaccination_records.select_related('pet', 'pet__pessoa').order_by('-administered_date')[:5]
         return VaccinationRecordMinimalSerializer(records, many=True).data

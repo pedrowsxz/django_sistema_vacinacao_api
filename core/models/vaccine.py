@@ -4,34 +4,34 @@ from django.core.validators import MinValueValidator
 
 class Vaccine(models.Model):
     """
-    Represents a type of vaccine that can be administered to pets.
+    Representa um tipo de vacina que pode ser administrada.
     """
     name = models.CharField(
         max_length=200,
         unique=True,
-        help_text="Vaccine name (e.g., 'Rabies', 'DHPP')"
+        help_text="Nome da vacina"
     )
     manufacturer = models.CharField(
         max_length=200,
         blank=True,
-        help_text="Pharmaceutical company"
+        help_text="Fabricante farmacêutico"
     )
     description = models.TextField(
         blank=True,
-        help_text="What the vaccine protects against"
+        help_text="Descrição do que a vacina protege"
     )
     species_target = models.CharField(
         max_length=50,
         blank=True,
-        help_text="Target species (e.g., 'dog', 'cat', 'all')"
+        help_text="Espécies alvo"
     )
     duration_months = models.PositiveIntegerField(
         validators=[MinValueValidator(1)],
-        help_text="Validity period in months (for next dose calculation)"
+        help_text="Periodo de validade em meses (para cálculo da próxima dose)"
     )
     is_mandatory = models.BooleanField(
         default=False,
-        help_text="Whether this vaccine is legally required"
+        help_text="Se esta vacina é legalmente obrigatória"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

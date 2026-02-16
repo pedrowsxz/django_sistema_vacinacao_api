@@ -5,7 +5,7 @@ from core.models import Pessoa
 
 class PessoaSerializer(serializers.ModelSerializer):
     """
-    Basic serializer for Pessoa list and create operations.
+    Serializer  para operações de listagem e criação de Pessoa.
     """
     username = serializers.CharField(source='user.username', read_only=True)
     total_pets = serializers.ReadOnlyField()
@@ -27,7 +27,7 @@ class PessoaSerializer(serializers.ModelSerializer):
 
 class PessoaDetailSerializer(PessoaSerializer):
     """
-    Detailed serializer with nested pet information.
+    Serializer detalhado com informações dos pets.
     """
     pets = serializers.SerializerMethodField()
     
@@ -35,14 +35,14 @@ class PessoaDetailSerializer(PessoaSerializer):
         fields = PessoaSerializer.Meta.fields + ['pets', 'updated_at']
     
     def get_pets(self, obj):
-        """Return simplified pet data"""
+        """Retornar dados simplificados dos pets"""
         from core.serializers.pet import PetMinimalSerializer
         return PetMinimalSerializer(obj.pets.all(), many=True).data
 
 
 class PessoaCreateSerializer(serializers.ModelSerializer):
     """
-    Serializer for creating a new pessoa with user account.
+    Serializer para criar uma nova pessoa com conta de usuário.
     """
     username = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True, style={'input_type': 'password'})
@@ -60,17 +60,17 @@ class PessoaCreateSerializer(serializers.ModelSerializer):
         ]
     
     def create(self, validated_data):
-        """Create user and pessoa in one transaction"""
+        """Criar usuário e pessoa em uma única transação"""
         username = validated_data.pop('username')
         password = validated_data.pop('password')
         
-        # Create user
+        # Criar usuário
         user = User.objects.create_user(
             username=username,
             email=validated_data['email'],
             password=password
         )
         
-        # Create pessoa linked to user
+        # Criar pessoa vinculada ao usuário
         pessoa = Pessoa.objects.create(user=user, **validated_data)
         return pessoa

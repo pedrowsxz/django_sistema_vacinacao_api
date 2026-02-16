@@ -10,13 +10,13 @@ from core.permissions import IsPessoaOrReadOnly
 
 class PetViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for Pet CRUD operations.
+    ViewSet para operações CRUD de Pets.
     
-    list: Get all pets (filtered by pessoa for regular users)
-    create: Register a new pet
-    retrieve: Get pet details with vaccination history
-    update: Update pet information
-    destroy: Delete a pet
+    list: Obter todos os pets (filtrados pela pessoa para usuários comuns)
+    create: Registrar um novo pet
+    retrieve: Obter detalhes do pet com histórico de vacinação
+    update: Atualizar informações do pet
+    destroy: Deletar um pet
     """
     permission_classes = [IsAuthenticated, IsPessoaOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -26,26 +26,26 @@ class PetViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """
-        Filter pets based on user permissions.
-        Regular users can only see their own pets.
-        Staff can see all pets.
+        Filtrar pets com base nas permissões do usuário.
+        Usuários comuns só podem ver seus próprios pets.
+        Staff pode ver todos os pets.
         """
         user = self.request.user
         queryset = Pet.objects.select_related('pessoa', 'pessoa__user')
         
         if user.is_staff:
-            # Staff can see all pets
+            # Staff pode ver todos os pets
             queryset = queryset.all()
         else:
-            # Regular users only see their own pets
+            # Usuários comuns só veem seus próprios pets
             queryset = queryset.filter(pessoa__user=user)
         
-        # Filter by species if provided
+        # Filtrar por espécie, se fornecida
         species = self.request.query_params.get('species', None)
         if species:
             queryset = queryset.filter(species=species)
         
-        # Filter by pessoa if provided (useful for staff)
+        # Filtrar por pessoa, se fornecido (útil para staff)
         pessoa_id = self.request.query_params.get('pessoa', None)
         if pessoa_id:
             queryset = queryset.filter(pessoa_id=pessoa_id)
@@ -64,15 +64,15 @@ class PetViewSet(viewsets.ModelViewSet):
         For staff users, allow specifying pessoa.
         """
         if not self.request.user.is_staff:
-            # Regular users: auto-assign to their pessoa profile
+            # Usuários comuns: atribuir automaticamente ao perfil pessoa
             serializer.save(pessoa=self.request.user.pessoa)
         else:
-            # Staff can specify pessoa
+            # Staff pode especificar a pessoa
             serializer.save()
     
     @action(detail=True, methods=['get'])
     def vaccinations(self, request, pk=None):
-        """Get all vaccination records for a specific pet"""
+        """Obter todos os registros de vacinação de um pet específico"""
         pet = self.get_object()
         from core.serializers import VaccinationRecordSerializer
         records = pet.vaccination_records.select_related('vaccine').order_by('-administered_date')
@@ -81,7 +81,7 @@ class PetViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def upcoming_vaccinations(self, request, pk=None):
-        """Get upcoming/due vaccinations for a pet"""
+        """Obter vacinações futuras/próximas de um pet"""
         pet = self.get_object()
         from core.serializers import VaccinationRecordSerializer
         

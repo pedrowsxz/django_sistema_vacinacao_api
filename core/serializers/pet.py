@@ -5,7 +5,7 @@ from datetime import date
 
 class PetMinimalSerializer(serializers.ModelSerializer):
     """
-    Minimal pet data for nested representations.
+    Dados mínimos do pet para representações aninhadas.
     """
     species_display = serializers.CharField(source='get_species_display', read_only=True)
     age_years = serializers.ReadOnlyField()
@@ -17,7 +17,7 @@ class PetMinimalSerializer(serializers.ModelSerializer):
 
 class PetSerializer(serializers.ModelSerializer):
     """
-    Standard serializer for Pet list and create operations.
+    Serializer para listagem e criação de Pet.
     """
     pessoa_name = serializers.CharField(source='pessoa.name', read_only=True)
     species_display = serializers.CharField(source='get_species_display', read_only=True)
@@ -45,21 +45,19 @@ class PetSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at']
     
     def validate_birth_date(self, value):
-        """Ensure birth date is not in the future"""
         if value > date.today():
-            raise serializers.ValidationError("Birth date cannot be in the future.")
+            raise serializers.ValidationError("A data de nascimento não pode estar no futuro.")
         return value
     
     def validate_weight(self, value):
-        """Ensure weight is positive"""
         if value is not None and value <= 0:
-            raise serializers.ValidationError("Weight must be greater than zero.")
+            raise serializers.ValidationError("O peso deve ser maior que zero.")
         return value
 
 
 class PetDetailSerializer(PetSerializer):
     """
-    Detailed serializer with vaccination history.
+    Serializer detalhado com histórico de vacinação.
     """
     pessoa = serializers.SerializerMethodField()
     vaccination_history = serializers.SerializerMethodField()
@@ -73,7 +71,7 @@ class PetDetailSerializer(PetSerializer):
         ]
     
     def get_pessoa(self, obj):
-        """Return pessoa details"""
+        """Retornar detalhes da pessoa"""
         return {
             'id': obj.pessoa.id,
             'name': obj.pessoa.name,
@@ -82,11 +80,11 @@ class PetDetailSerializer(PetSerializer):
         }
     
     def get_vaccination_history(self, obj):
-        """Return vaccination records for this pet"""
+        """Retornar registros de vacinação deste pet"""
         from core.serializers.vaccination_record import VaccinationRecordSerializer
         records = obj.vaccination_records.select_related('vaccine').order_by('-administered_date')[:10]
         return VaccinationRecordSerializer(records, many=True).data
     
     def get_vaccination_count(self, obj):
-        """Return total vaccination count"""
+        """Retornar contagem total de vacinações"""
         return obj.vaccination_records.count()

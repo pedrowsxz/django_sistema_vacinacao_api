@@ -11,7 +11,7 @@ from core.serializers import PessoaCreateSerializer, PessoaSerializer
 
 
 class AuthRateThrottle(AnonRateThrottle):
-    """Custom throttle for auth endpoints"""
+    """Throttle personalizado para endpoints de autenticação"""
     rate = '5/minute'
 
 
@@ -20,26 +20,26 @@ class AuthRateThrottle(AnonRateThrottle):
 @throttle_classes([AuthRateThrottle])
 def register(request):
     """
-    Register a new user and pessoa account.
+    Registrar um novo usuário e conta de pessoa.
     
-    Required fields:
-    - username: Unique username
-    - password: Strong password
-    - name: Full name
-    - email: Valid email address
+    Campos obrigatórios:
+    - username: Nome de usuário único
+    - password: Senha forte
+    - name: Nome completo
+    - email: Endereço de e-mail válido
     
-    Optional fields:
-    - phone: Contact number
-    - address: Physical address
+    Campos opcionais:
+    - phone: Número de contato
+    - address: Endereço físico
     
-    Returns:
-    - token: Authentication token
-    - pessoa: Pessoa profile data
+    Retorna:
+    - token: Token de autenticação
+    - pessoa: Dados do perfil da pessoa
     """
     serializer = PessoaCreateSerializer(data=request.data)
     
     if serializer.is_valid():
-        # Validate password strength
+        # Validar força da senha
         password = request.data.get('password')
         try:
             validate_password(password)
@@ -74,15 +74,15 @@ def register(request):
 @throttle_classes([AuthRateThrottle])
 def login(request):
     """
-    Authenticate user and return token.
+    Autenticar usuário e retornar token.
     
-    Required fields:
-    - username: User's username
-    - password: User's password
+    Campos obrigatórios:
+    - username: Nome de usuário
+    - password: Senha
     
-    Returns:
-    - token: Authentication token
-    - pessoa: Pessoa profile data (if exists)
+    Retorna:
+    - token: Token de autenticação
+    - pessoa: Dados do perfil da pessoa (se existir)
     """
     username = request.data.get('username')
     password = request.data.get('password')
@@ -90,7 +90,7 @@ def login(request):
     # Validate input
     if not username or not password:
         return Response({
-            'error': 'Please provide both username and password'
+            'error': 'Por favor, forneça tanto nome de usuário quanto senha'
         }, status=status.HTTP_400_BAD_REQUEST)
     
     # Authenticate
@@ -98,18 +98,18 @@ def login(request):
     
     if not user:
         return Response({
-            'error': 'Invalid credentials'
+            'error': 'Credenciais inválidas'
         }, status=status.HTTP_401_UNAUTHORIZED)
     
     if not user.is_active:
         return Response({
-            'error': 'Account is disabled'
+            'error': 'Conta desativada'
         }, status=status.HTTP_401_UNAUTHORIZED)
     
     # Get or create token
     token, created = Token.objects.get_or_create(user=user)
     
-    # Get pessoa profile if exists
+    # Get perfil da pessoa se existe
     try:
         pessoa = user.pessoa
         pessoa_data = {
@@ -136,18 +136,18 @@ def login(request):
 @permission_classes([IsAuthenticated])
 def logout(request):
     """
-    Logout user by deleting their auth token.
-    Requires: Authorization header with token
+    Logout do usuário deletando seu token de autenticação.
+    Requer: Header Authorization com o token
     """
     try:
         # Delete the token
         request.user.auth_token.delete()
         return Response({
-            'message': 'Successfully logged out'
+            'message': 'Logout realizado com sucesso'
         }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({
-            'error': 'Something went wrong during logout'
+            'error': 'Ocorreu um erro durante o logout'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -155,7 +155,7 @@ def logout(request):
 @permission_classes([IsAuthenticated])
 def profile(request):
     """
-    Get current user's profile information.
+    Obter informações do perfil do usuário atual.
     """
     try:
         pessoa = request.user.pessoa
@@ -163,7 +163,7 @@ def profile(request):
         return Response(serializer.data)
     except:
         return Response({
-            'error': 'Pessoa profile not found for this user'
+            'error': 'Perfil de pessoa não encontrado para este usuário'
         }, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -171,13 +171,7 @@ def profile(request):
 @permission_classes([IsAuthenticated])
 def update_profile(request):
     """
-    Update current user's profile information.
-    
-    Allowed fields:
-    - name
-    - email
-    - phone
-    - address
+    Atualizar informações do perfil do usuário atual.
     """
     try:
         pessoa = request.user.pessoa
@@ -186,14 +180,14 @@ def update_profile(request):
         if serializer.is_valid():
             serializer.save()
             return Response({
-                'message': 'Profile updated successfully',
+                'message': 'Perfil atualizado com sucesso',
                 'pessoa': serializer.data
             })
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except:
         return Response({
-            'error': 'Pessoa profile not found'
+            'error': 'Perfil de pessoa não encontrado'
         }, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -201,11 +195,7 @@ def update_profile(request):
 @permission_classes([IsAuthenticated])
 def change_password(request):
     """
-    Change user password.
-    
-    Required fields:
-    - old_password: Current password
-    - new_password: New password
+    Alterar a senha do usuário.
     """
     user = request.user
     old_password = request.data.get('old_password')
@@ -213,13 +203,13 @@ def change_password(request):
     
     if not old_password or not new_password:
         return Response({
-            'error': 'Please provide both old and new password'
+            'error': 'Por favor, forneça a senha antiga e a nova'
         }, status=status.HTTP_400_BAD_REQUEST)
     
     # Check old password
     if not user.check_password(old_password):
         return Response({
-            'error': 'Old password is incorrect'
+            'error': 'Senha antiga está incorreta'
         }, status=status.HTTP_400_BAD_REQUEST)
     
     # Validate new password
@@ -239,6 +229,6 @@ def change_password(request):
     token = Token.objects.create(user=user)
     
     return Response({
-        'message': 'Password changed successfully',
+        'message': 'Senha alterada com sucesso',
         'token': token.key
     })

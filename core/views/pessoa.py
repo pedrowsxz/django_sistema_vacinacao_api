@@ -14,22 +14,22 @@ from core.permissions import IsPessoa, IsPessoaOrReadOnly
 
 class PessoaViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for Pessoa CRUD operations.
+    ViewSet para operações CRUD de Pessoa.
     
-    list: Get all pessoas (admin only) or current user's pessoa profile
-    create: Register a new pessoa with user account
-    retrieve: Get pessoa details with pet list
-    update: Update pessoa information
-    destroy: Delete pessoa account
+    list: Obter todas as pessoas (somente admin) ou perfil da pessoa do usuário atual
+    create: Registrar uma nova pessoa com conta de usuário
+    retrieve: Obter detalhes da pessoa com lista de pets
+    update: Atualizar informações da pessoa
+    destroy: Deletar conta da pessoa
     """
     # FIXED: Use IsPessoa for stricter permission control
     permission_classes = [IsAuthenticated, IsPessoa]
     
     def get_queryset(self):
         """
-        Filter queryset based on user permissions.
-        Regular users can only see their own pessoa profile.
-        Staff can see all pessoas.
+        Filtrar queryset com base nas permissões do usuário.
+        Usuários comuns só podem ver seu próprio perfil de pessoa.
+        Staff/admin pode ver todas as pessoas.
         """
         user = self.request.user
         if user.is_staff:
@@ -37,13 +37,13 @@ class PessoaViewSet(viewsets.ModelViewSet):
                 pet_count=Count('pets')
             ).select_related('user').all()
         
-        # Regular users can only access their own pessoa profile
+        # Usuários comuns só podem acessar seu próprio perfil de pessoa
         return Pessoa.objects.filter(user=user).annotate(
             pet_count=Count('pets')
         )
     
     def get_serializer_class(self):
-        """Use different serializers for different actions"""
+        """Usar serializers diferentes para ações diferentes"""
         if self.action == 'create':
             return PessoaCreateSerializer
         elif self.action == 'retrieve':
@@ -51,14 +51,14 @@ class PessoaViewSet(viewsets.ModelViewSet):
         return PessoaSerializer
     
     def get_permissions(self):
-        """Allow anyone to create an account (register)"""
+        """Permitir que qualquer pessoa crie uma conta (registro)"""
         if self.action == 'create':
             return [AllowAny()]
         return super().get_permissions()
     
     @action(detail=True, methods=['get'])
     def pets(self, request, pk=None):
-        """Get all pets for a specific pessoa"""
+        """Obter todos os pets de uma pessoa específica"""
         pessoa = self.get_object()
         from core.serializers import PetSerializer
         pets = pessoa.pets.all()
@@ -67,7 +67,7 @@ class PessoaViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def vaccination_summary(self, request, pk=None):
-        """Get vaccination summary for all pessoa's pets"""
+        """Obter resumo de vacinação de todos os pets da pessoa"""
         pessoa = self.get_object()
         
         summary = {

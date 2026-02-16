@@ -9,19 +9,13 @@ from core.permissions import IsAdminOrReadOnly
 
 class VaccineViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for Vaccine CRUD operations.
+    ViewSet para operações CRUD de Vacinas.
     
-    FIXED: Only admins can create/update/delete vaccines.
-    Regular users can only read vaccine information.
-    
-    list: Get all available vaccines
-    create: Register a new vaccine type (admin only)
-    retrieve: Get vaccine details with administration history
-    update: Update vaccine information (admin only)
-    destroy: Delete a vaccine (admin only)
+    Apenas administradores podem criar/atualizar/deletar vacinas.
+    Usuários comuns podem apenas ler informações sobre vacinas.
+
     """
     queryset = Vaccine.objects.all()
-    # FIXED: Use IsAdminOrReadOnly to restrict write operations
     permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'manufacturer', 'species_target']
@@ -32,12 +26,12 @@ class VaccineViewSet(viewsets.ModelViewSet):
         """Apply filters from query parameters"""
         queryset = super().get_queryset()
         
-        # Filter by species
+        # Filtrar por espécie
         species = self.request.query_params.get('species', None)
         if species:
             queryset = queryset.filter(species_target=species)
         
-        # Filter by mandatory status
+        # Filtrar por obrigatoriedade
         mandatory = self.request.query_params.get('mandatory', None)
         if mandatory is not None:
             is_mandatory = mandatory.lower() in ('true', '1', 'yes')
@@ -46,19 +40,19 @@ class VaccineViewSet(viewsets.ModelViewSet):
         return queryset
     
     def get_serializer_class(self):
-        """Use detailed serializer for retrieve action"""
+        """Usar serializer detalhado para retrieve"""
         if self.action == 'retrieve':
             return VaccineDetailSerializer
         return VaccineSerializer
     
     @action(detail=True, methods=['get'])
     def statistics(self, request, pk=None):
-        """Get statistics for a specific vaccine"""
+        """Obter estatísticas para uma vacina específica"""
         vaccine = self.get_object()
         
         total_administrations = vaccine.vaccination_records.count()
         
-        # Get pets vaccinated grouped by species
+        # GObter estatísticas para uma vacina específica
         from django.db.models import Count
         by_species = vaccine.vaccination_records.values(
             'pet__species'

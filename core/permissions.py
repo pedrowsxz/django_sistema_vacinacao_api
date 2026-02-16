@@ -3,36 +3,35 @@ from rest_framework import permissions
 
 class IsPessoaOrReadOnly(permissions.BasePermission):
     """
-    Custom permission to only allow owners of an object to edit it.
-    Read permissions are allowed to authenticated users.
+    Permissão personalizada para permitir que apenas os donos de um objeto possam editá-lo.
+    Permissões de leitura são permitidas para usuários autenticados.
     """
     
-    message = "You do not have permission to modify this resource."
+    message = "Você não tem permissão para modificar este recurso."
     
     def has_permission(self, request, view):
-        """Check if user is authenticated"""
+        """Verifica se o usuário está autenticado"""
         return request.user and request.user.is_authenticated
     
     def has_object_permission(self, request, view, obj):
         """
-        Read permissions for any authenticated user.
-        Write permissions only for the owner.
+        Permissões de leitura para qualquer usuário autenticado.
+        Permissões de edição apenas para o proprietário.
         """
         # Read permissions (GET, HEAD, OPTIONS)
         if request.method in permissions.SAFE_METHODS:
             return True
         
-        # Staff users have full access
+        # Usuários staff têm acesso total
         if request.user.is_staff:
             return True
         
-        # Check ownership based on object type
+        # Verifica a relação pessoa-pet com base no tipo de objeto
         return self._check_ownership(request.user, obj)
     
     def _check_ownership(self, user, obj):
         """
-        Determine ownership based on object type.
-        FIXED: Returns False instead of raising PermissionDenied
+        Determina a relação pessoa-pet com base no tipo de objeto.
         """
         # Pet model
         if hasattr(obj, 'pessoa') and hasattr(obj.pessoa, 'user'):
@@ -46,35 +45,34 @@ class IsPessoaOrReadOnly(permissions.BasePermission):
         if hasattr(obj, 'pet') and hasattr(obj.pet, 'pessoa'):
             return obj.pet.pessoa.user == user
         
-        # Default: deny access
+        # Padrão: rejeitar accesso
         return False
 
 
 class IsPessoa(permissions.BasePermission):
     """
-    Strict permission - only owners can access.
-    No read access for non-owners.
+    Permissão estrita - apenas os proprietários podem acessar.
+    Sem acesso de leitura para não proprietários.
     """
     
-    message = "You can only access your own resources."
+    message = "Você só pode acessar seus próprios recursos."
     
     def has_permission(self, request, view):
-        """Check if user is authenticated"""
+        """Verifica se o usuário está autenticado"""
         return request.user and request.user.is_authenticated
     
     def has_object_permission(self, request, view, obj):
-        """Only owners can access"""
-        # Staff users have full access
+        """Apenas os proprietários podem acessar"""
+        # Usuários staff têm acesso total
         if request.user.is_staff:
             return True
         
-        # Check ownership - FIXED: Returns False instead of raising
+        # Verifica relação pessoa-pet
         return self._check_ownership(request.user, obj)
     
     def _check_ownership(self, user, obj):
         """
-        Determine ownership.
-        FIXED: Returns False instead of raising PermissionDenied
+        Determina a relação entre pessoa e pet.
         """
         if hasattr(obj, 'pessoa') and hasattr(obj.pessoa, 'user'):
             return obj.pessoa.user == user
@@ -90,21 +88,21 @@ class IsPessoa(permissions.BasePermission):
 
 class IsPessoaOrAdmin(permissions.BasePermission):
     """
-    Permission for sensitive operations.
-    Only owner or admin staff can access.
+    Permissão para operações sensíveis.
+    Apenas o proprietário ou usuários staff podem acessar.
     """
     
-    message = "You can only access your own resources or must be an admin."
+    message = "Você só pode acessar seus próprios recursos ou deve ser um administrador."
     
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated
     
     def has_object_permission(self, request, view, obj):
-        # Admin staff can access everything
+        # Usuários staff/admin podem acessar tudo
         if request.user.is_staff:
             return True
         
-        # Owner can access their own resources
+        # A pessoa pode acessar seus próprios recursos
         if hasattr(obj, 'pessoa') and hasattr(obj.pessoa, 'user'):
             return obj.pessoa.user == request.user
         
@@ -119,24 +117,24 @@ class IsPessoaOrAdmin(permissions.BasePermission):
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
-    Permission for resources that should be managed by admins only.
-    Regular users can only read.
+    Permissão para recursos que devem ser gerenciados apenas por administradores.
+    Usuários comuns podem apenas ler.
     """
     
-    message = "Only administrators can modify this resource."
+    message = "Apenas administradores podem modificar este recurso."
     
     def has_permission(self, request, view):
-        # Everyone can read
+        # Todos podem ler
         if request.method in permissions.SAFE_METHODS:
             return request.user and request.user.is_authenticated
         
-        # Only staff can write
+        # Apenas staff/admin podem escrever
         return request.user and request.user.is_staff
     
     def has_object_permission(self, request, view, obj):
-        # Everyone can read
+        # Todos podem ler
         if request.method in permissions.SAFE_METHODS:
             return True
         
-        # Only staff can write
+        # Apenas staff/admin podem escrever
         return request.user.is_staff

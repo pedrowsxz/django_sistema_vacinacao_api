@@ -14,13 +14,13 @@ from core.permissions import IsPessoaOrReadOnly
 
 class VaccinationRecordViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for VaccinationRecord CRUD operations.
+    ViewSet para operações CRUD de Registro de Vacinação.
     
-    list: Get all vaccination records (filtered by owner)
-    create: Record a new vaccination
-    retrieve: Get detailed vaccination record
-    update: Update vaccination record
-    destroy: Delete a vaccination record
+    list: Obter todos os registros de vacinação (filtrados pelo proprietário)
+    create: Registrar uma nova vacinação
+    retrieve: Obter registro de vacinação detalhado
+    update: Atualizar registro de vacinação
+    destroy: Deletar um registro de vacinação
     """
     permission_classes = [IsAuthenticated, IsPessoaOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -30,8 +30,8 @@ class VaccinationRecordViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """
-        Filter vaccination records based on user permissions.
-        Regular users can only see records for their own pets.
+        Filtrar registros de vacinação com base nas permissões do usuário.
+        Usuários comuns só podem ver registros dos seus próprios pets.
         """
         user = self.request.user
         queryset = VaccinationRecord.objects.select_related(
@@ -41,20 +41,20 @@ class VaccinationRecordViewSet(viewsets.ModelViewSet):
         if user.is_staff:
             queryset = queryset.all()
         else:
-            # Filter to only show records for user's pets
+            # Filtrar apenas registros dos pets do usuário
             queryset = queryset.filter(pet__pessoa__user=user)
         
-        # Filter by pet
+        # Filtrar por pet
         pet_id = self.request.query_params.get('pet', None)
         if pet_id:
             queryset = queryset.filter(pet_id=pet_id)
         
-        # Filter by vaccine
+        # Filtrar por vacina
         vaccine_id = self.request.query_params.get('vaccine', None)
         if vaccine_id:
             queryset = queryset.filter(vaccine_id=vaccine_id)
         
-        # Filter by date range
+        # Filtrar por intervalo de datas
         date_from = self.request.query_params.get('date_from', None)
         date_to = self.request.query_params.get('date_to', None)
         
@@ -66,22 +66,20 @@ class VaccinationRecordViewSet(viewsets.ModelViewSet):
         return queryset
     
     def get_serializer_class(self):
-        """Use detailed serializer for retrieve action"""
+        """Usar serializer detalhado para a ação retrieve"""
         if self.action == 'retrieve':
             return VaccinationRecordDetailSerializer
         return VaccinationRecordSerializer
     
     def perform_create(self, serializer):
         """
-        FIXED: Let the permission class handle validation.
-        The IsPessoaOrReadOnly permission will check ownership when saving.
+        Atribuir o pet ao usuário autenticado ao criar um registro de vacinação.
         """
-        # Just save - permission class will validate ownership
         serializer.save()
     
     @action(detail=False, methods=['get'])
     def due_soon(self, request):
-        """Get all vaccinations due within the next 30 days"""
+        """Obter todas as vacinações com data de próxima dose nos próximos 30 dias"""
         user = request.user
         today = date.today()
         thirty_days = today + timedelta(days=30)
@@ -96,7 +94,7 @@ class VaccinationRecordViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def overdue(self, request):
-        """Get all overdue vaccinations"""
+        """Obter todas as vacinações atrasadas"""
         today = date.today()
         
         queryset = self.get_queryset().filter(
@@ -108,7 +106,7 @@ class VaccinationRecordViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def recent(self, request):
-        """Get recent vaccinations (last 30 days)"""
+        """Obter vacinações recentes (últimos 30 dias)"""
         thirty_days_ago = date.today() - timedelta(days=30)
         
         queryset = self.get_queryset().filter(

@@ -5,8 +5,8 @@ from datetime import date
 
 class Pet(models.Model):
     """
-    Represents a pet registered in the system.
-    Each pet belongs to one pessoa.
+    Representa um pet cadastrado no sistema.
+    Cada pet pertence a uma pessoa.
     """
     SPECIES_CHOICES = [
         ('dog', 'Dog'),
@@ -22,31 +22,31 @@ class Pet(models.Model):
         'Pessoa',
         on_delete=models.CASCADE,
         related_name='pets',
-        help_text="Pet pessoa"
+        help_text="Pessoa dona do pet"
     )
     name = models.CharField(max_length=100)
     species = models.CharField(
         max_length=20,
         choices=SPECIES_CHOICES,
-        help_text="Type of animal"
+        help_text="Tipo de animal"
     )
     breed = models.CharField(
         max_length=100,
         blank=True,
-        help_text="Breed (if applicable)"
+        help_text="Raça (se aplicável)"
     )
-    birth_date = models.DateField(help_text="Date of birth")
+    birth_date = models.DateField(help_text="Data de nascimento")
     color = models.CharField(max_length=50, blank=True)
     weight = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         null=True,
         blank=True,
-        help_text="Weight in kg"
+        help_text="Peso in kg"
     )
     notes = models.TextField(
         blank=True,
-        help_text="Additional notes about the pet"
+        help_text="Observações adicionais sobre o pet"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -65,17 +65,17 @@ class Pet(models.Model):
     
     @property
     def age_years(self):
-        """Calculate pet's age in years"""
+        """Calcula a idade do pet em anos"""
         today = date.today()
         age = today.year - self.birth_date.year
-        # Adjust if birthday hasn't occurred yet this year
+        # Ajusta se o aniversário ainda não ocorreu neste ano
         if (today.month, today.day) < (self.birth_date.month, self.birth_date.day):
             age -= 1
         return age
     
     @property
     def age_months(self):
-        """Calculate pet's age in months"""
+        """Calcula a idade do pet em meses"""
         today = date.today()
         months = (today.year - self.birth_date.year) * 12
         months += today.month - self.birth_date.month
@@ -84,22 +84,22 @@ class Pet(models.Model):
         return max(0, months)
     
     def clean(self):
-        """Validate model fields"""
+        """Valida os campos do modelo"""
         super().clean()
         
-        # Validate birth_date is not in the future
+        # Valida que a data de nascimento não esteja no futuro
         if self.birth_date and self.birth_date > date.today():
             raise ValidationError({
-                'birth_date': 'Birth date cannot be in the future.'
+                'birth_date': 'Data de nascimento não pode estar no futuro.'
             })
         
-        # Validate weight is positive
+        # Valida que o peso seja positivo
         if self.weight is not None and self.weight <= 0:
             raise ValidationError({
-                'weight': 'Weight must be greater than zero.'
+                'weight': 'Peso deve ser maior que zero.'
             })
     
     def save(self, *args, **kwargs):
-        """Override save to call clean()"""
+        """Sobrescreve o save para chamar clean()"""
         self.full_clean()
         super().save(*args, **kwargs)
