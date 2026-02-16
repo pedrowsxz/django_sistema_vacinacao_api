@@ -5,10 +5,9 @@ from core.views import (
     PetViewSet,
     VaccineViewSet,
     VaccinationRecordViewSet,
-    register,
-    login,
-    logout
 )
+#from core.views.auth_jwt import register, login, logout, profile, update_profile, change_password, refresh_token
+from core.views.auth import register, login, logout, profile, update_profile, change_password 
 
 # Create router and register viewsets
 router = DefaultRouter()
@@ -23,6 +22,10 @@ urlpatterns = [
     path('auth/register/', register, name='register'),
     path('auth/login/', login, name='login'),
     path('auth/logout/', logout, name='logout'),
+    path('auth/profile/', profile, name='profile'),
+    path('auth/profile/update/', update_profile, name='update-profile'),
+    path('auth/change-password/', change_password, name='change-password'),
+    #path('auth/refresh/', refresh_token, name='refresh-token'),
     
     # Router URLs (CRUD endpoints)
     path('', include(router.urls)),

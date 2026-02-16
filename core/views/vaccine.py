@@ -4,20 +4,25 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from core.models import Vaccine
 from core.serializers import VaccineSerializer, VaccineDetailSerializer
+from core.permissions import IsAdminOrReadOnly
 
 
 class VaccineViewSet(viewsets.ModelViewSet):
     """
     ViewSet for Vaccine CRUD operations.
     
+    FIXED: Only admins can create/update/delete vaccines.
+    Regular users can only read vaccine information.
+    
     list: Get all available vaccines
-    create: Register a new vaccine type
+    create: Register a new vaccine type (admin only)
     retrieve: Get vaccine details with administration history
-    update: Update vaccine information
-    destroy: Delete a vaccine
+    update: Update vaccine information (admin only)
+    destroy: Delete a vaccine (admin only)
     """
     queryset = Vaccine.objects.all()
-    permission_classes = [IsAuthenticated]
+    # FIXED: Use IsAdminOrReadOnly to restrict write operations
+    permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'manufacturer', 'species_target']
     ordering_fields = ['name', 'duration_months', 'created_at']

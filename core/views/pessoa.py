@@ -9,7 +9,7 @@ from core.serializers import (
     PessoaDetailSerializer,
     PessoaCreateSerializer
 )
-from core.permissions import IsPessoa
+from core.permissions import IsPessoa, IsPessoaOrReadOnly
 
 
 class PessoaViewSet(viewsets.ModelViewSet):
@@ -22,7 +22,8 @@ class PessoaViewSet(viewsets.ModelViewSet):
     update: Update pessoa information
     destroy: Delete pessoa account
     """
-    permission_classes = [IsAuthenticated]
+    # FIXED: Use IsPessoa for stricter permission control
+    permission_classes = [IsAuthenticated, IsPessoa]
     
     def get_queryset(self):
         """

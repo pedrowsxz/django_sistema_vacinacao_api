@@ -73,17 +73,10 @@ class VaccinationRecordViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         """
-        Validate pet ownership before creating record.
-        Regular users can only create records for their own pets.
+        FIXED: Let the permission class handle validation.
+        The IsPessoaOrReadOnly permission will check ownership when saving.
         """
-        pet = serializer.validated_data.get('pet')
-        
-        if not self.request.user.is_staff:
-            # Verify the pet belongs to the current user
-            if pet.pessoa.user != self.request.user:
-                from rest_framework.exceptions import PermissionDenied
-                raise PermissionDenied("You can only add vaccination records for your own pets.")
-        
+        # Just save - permission class will validate ownership
         serializer.save()
     
     @action(detail=False, methods=['get'])

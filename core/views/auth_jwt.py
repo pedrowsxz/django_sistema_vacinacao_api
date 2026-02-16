@@ -2,8 +2,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.authtoken.models import Token
 from rest_framework.throttling import AnonRateThrottle
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -11,35 +11,26 @@ from core.serializers import PessoaCreateSerializer, PessoaSerializer
 
 
 class AuthRateThrottle(AnonRateThrottle):
-    """Custom throttle for auth endpoints"""
     rate = '5/minute'
+
+
+def get_tokens_for_user(user):
+    """Generate JWT tokens for user"""
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def register(request):
-    """
-    Register a new user and pessoa account.
-    
-    Required fields:
-    - username: Unique username
-    - password: Strong password
-    - name: Full name
-    - email: Valid email address
-    
-    Optional fields:
-    - phone: Contact number
-    - address: Physical address
-    
-    Returns:
-    - token: Authentication token
-    - pessoa: Pessoa profile data
-    """
+    """Register new user with JWT tokens"""
     serializer = PessoaCreateSerializer(data=request.data)
     
     if serializer.is_valid():
-        # Validate password strength
         password = request.data.get('password')
         try:
             validate_password(password)
@@ -48,21 +39,17 @@ def register(request):
                 'password': list(e.messages)
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Create pessoa (this also creates user)
         pessoa = serializer.save()
-        
-        # Generate token
-        token, created = Token.objects.get_or_create(user=pessoa.user)
+        tokens = get_tokens_for_user(pessoa.user)
         
         return Response({
             'message': 'Registration successful',
-            'token': token.key,
+            'tokens': tokens,
             'pessoa': {
                 'id': pessoa.id,
                 'username': pessoa.user.username,
                 'name': pessoa.name,
                 'email': pessoa.email,
-                'phone': pessoa.phone
             }
         }, status=status.HTTP_201_CREATED)
     
@@ -73,27 +60,15 @@ def register(request):
 @permission_classes([AllowAny])
 @throttle_classes([AuthRateThrottle])
 def login(request):
-    """
-    Authenticate user and return token.
-    
-    Required fields:
-    - username: User's username
-    - password: User's password
-    
-    Returns:
-    - token: Authentication token
-    - pessoa: Pessoa profile data (if exists)
-    """
+    """Login with JWT tokens"""
     username = request.data.get('username')
     password = request.data.get('password')
     
-    # Validate input
     if not username or not password:
         return Response({
             'error': 'Please provide both username and password'
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    # Authenticate
     user = authenticate(username=username, password=password)
     
     if not user:
@@ -106,10 +81,8 @@ def login(request):
             'error': 'Account is disabled'
         }, status=status.HTTP_401_UNAUTHORIZED)
     
-    # Get or create token
-    token, created = Token.objects.get_or_create(user=user)
+    tokens = get_tokens_for_user(user)
     
-    # Get pessoa profile if exists
     try:
         pessoa = user.pessoa
         pessoa_data = {
@@ -117,17 +90,13 @@ def login(request):
             'username': user.username,
             'name': pessoa.name,
             'email': pessoa.email,
-            'phone': pessoa.phone
         }
     except:
-        pessoa_data = {
-            'username': user.username,
-            'is_staff': user.is_staff
-        }
+        pessoa_data = {'username': user.username, 'is_staff': user.is_staff}
     
     return Response({
         'message': 'Login successful',
-        'token': token.key,
+        'tokens': tokens,
         'pessoa': pessoa_data
     })
 
@@ -136,21 +105,53 @@ def login(request):
 @permission_classes([IsAuthenticated])
 def logout(request):
     """
-    Logout user by deleting their auth token.
-    Requires: Authorization header with token
+    Logout by blacklisting the refresh token.
+    Send refresh token in request body.
     """
     try:
-        # Delete the token
-        request.user.auth_token.delete()
+        refresh_token = request.data.get('refresh')
+        if not refresh_token:
+            return Response({
+                'error': 'Refresh token required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        
         return Response({
             'message': 'Successfully logged out'
         }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({
-            'error': 'Something went wrong during logout'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            'error': 'Invalid token or token already blacklisted'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def refresh_token(request):
+    """
+    Refresh access token using refresh token.
+    Send refresh token in request body.
+    """
+    try:
+        refresh = request.data.get('refresh')
+        if not refresh:
+            return Response({
+                'error': 'Refresh token required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        refresh_token = RefreshToken(refresh)
+        
+        return Response({
+            'access': str(refresh_token.access_token)
+        })
+    except Exception as e:
+        return Response({
+            'error': 'Invalid or expired refresh token'
+        }, status=status.HTTP_401_UNAUTHORIZED)
+
+# Profile, update_profile, and change_password remain the same as Token version
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile(request):
@@ -231,14 +232,14 @@ def change_password(request):
         }, status=status.HTTP_400_BAD_REQUEST)
     
     # Set new password
+    # Only difference from Token version is that we return new tokens after password change
     user.set_password(new_password)
     user.save()
     
-    # Delete old token and create new one
-    Token.objects.filter(user=user).delete()
-    token = Token.objects.create(user=user)
-    
+    refresh = RefreshToken.for_user(user)
+
     return Response({
-        'message': 'Password changed successfully',
-        'token': token.key
-    })
+    'message': 'Password changed successfully',
+    'refresh': str(refresh),
+    'access': str(refresh.access_token),
+})
