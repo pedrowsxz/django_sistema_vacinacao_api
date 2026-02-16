@@ -1,12 +1,12 @@
-# API Reference
+# Referência da API
 
-Complete reference for all API endpoints with detailed examples.
+Referência completa para os endpoints da API com exemplos.
 
-## Complete Examples
+## Exemplos Completos
 
-### Example 1: Complete User Flow
+### Exemplo 1: Fluxo Completo do Usuário
 ```bash
-# 1. Register
+# 1. Registrar usuário
 curl -X POST http://localhost:8000/api/auth/register/ \
   -H "Content-Type: application/json" \
   -d '{
@@ -17,14 +17,15 @@ curl -X POST http://localhost:8000/api/auth/register/ \
     "phone": "+1234567890"
   }'
 
-# Save the token from response
-TOKEN="your-token-here"
+# Salvar o token da resposta
+TOKEN="seu-token-aqui"
 
-# 2. Create a pet
+# 2. Criar um pet
 curl -X POST http://localhost:8000/api/pets/ \
   -H "Authorization: Token $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
+    "pessoa":"1",
     "name": "Max",
     "species": "dog",
     "breed": "German Shepherd",
@@ -32,11 +33,11 @@ curl -X POST http://localhost:8000/api/pets/ \
     "weight": 32.5
   }'
 
-# 3. List vaccines
+# 3. Listar vacinas
 curl -X GET http://localhost:8000/api/vaccines/ \
   -H "Authorization: Token $TOKEN"
 
-# 4. Record vaccination
+# 4. Registrar vacinação
 curl -X POST http://localhost:8000/api/vaccinations/ \
   -H "Authorization: Token $TOKEN" \
   -H "Content-Type: application/json" \
@@ -47,53 +48,6 @@ curl -X POST http://localhost:8000/api/vaccinations/ \
     "veterinarian_name": "Dr. Wilson"
   }'
 
-# 5. Check upcoming vaccinations
+# 5. Verificar próximas vacinações
 curl -X GET http://localhost:8000/api/vaccinations/due_soon/ \
   -H "Authorization: Token $TOKEN"
-```
-
----
-
-### Example 2: Filtering and Search
-```bash
-# Search pets by name
-curl -X GET "http://localhost:8000/api/pets/?search=max" \
-  -H "Authorization: Token $TOKEN"
-
-# Filter pets by species
-curl -X GET "http://localhost:8000/api/pets/?species=dog" \
-  -H "Authorization: Token $TOKEN"
-
-# Get vaccinations for specific pet
-curl -X GET "http://localhost:8000/api/vaccinations/?pet=1" \
-  -H "Authorization: Token $TOKEN"
-
-# Get vaccinations in date range
-curl -X GET "http://localhost:8000/api/vaccinations/?date_from=2024-01-01&date_to=2024-12-31" \
-  -H "Authorization: Token $TOKEN"
-```
-
----
-
-### Example 3: Update and Delete
-```bash
-# Update pet weight
-curl -X PATCH http://localhost:8000/api/pets/1/ \
-  -H "Authorization: Token $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "weight": 33.0
-  }'
-
-# Update vaccination notes
-curl -X PATCH http://localhost:8000/api/vaccinations/1/ \
-  -H "Authorization: Token $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "notes": "Updated: No adverse reactions after 48 hours"
-  }'
-
-# Delete a pet
-curl -X DELETE http://localhost:8000/api/pets/1/ \
-  -H "Authorization: Token $TOKEN"
-```

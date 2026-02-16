@@ -254,7 +254,7 @@ GET    /api/vaccinations/recent/    → core/views/vaccination_record.py → Vac
 
 ## Modelos e Propriedades
 
-Decidi nomear as propriedades e os models em inglês, pois achei que melhor contextualiza com os termos da sintaxe do django. Apenas traduzi o modelo 'Pessoa'
+Decidi nomear os modelos, propriedades e métodos em inglês, pois achei que melhor contextualizaria com os termos da sintaxe Python e Django, mantendo a consistência com os padrões da framework. Apenas traduzi o modelo 'Pessoa'.
 
 ### 1. Pessoa
 Representa um dono de pet, vinculado ao modelo `User` do Django.
