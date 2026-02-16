@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     # Apps de terceiros
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework_simplejwt',
     
     # Apps locais
     'core',

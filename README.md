@@ -7,6 +7,17 @@ Uma API REST para gerenciar registros de vacinação de pets, usando Django.
 ![DRF](https://img.shields.io/badge/DRF-3.14-red.svg)
 
 
+## Catálogo
+
+- [Overview](#overview)
+- [Tecnologias](#tecnologias)
+- [Instalação](#instalação)
+- [Documentação da API](#documentação-da-api)
+- [Decisões Técnicas](#decisões-técnicas)
+- [Mapeamento das URLs](#mapeamento-das-urls)
+- [Modelos e Propriedades](#modelos-e-propriedades)
+
+
 ## Overview
 
 Este sistema permite o acompanhamento do histórico de vacinação, gerenciamento dos registros dos pets e monitoremento dos próximos agendamentos de vacinas.
@@ -21,8 +32,7 @@ A API fornece operações completas de CRUD para pets, vacinas e registros de va
 
 ---
 
-
-## Technologias
+## Tecnologias
 
 ### Backend
 - **Python 3.10.12**
@@ -36,7 +46,7 @@ A API fornece operações completas de CRUD para pets, vacinas e registros de va
 - **python-decouple** - Gerenciamento de variáveis de ambiente
 - **python-dateutil** - Cálculos de datas
 
-## Sugestões
+### Sugestões
 - **curl** Ferramenta de linha de comando para fazer requisições HTTP aos endpoints da API, permitindo testar manualmente as rotas, enviar dados e verificar respostas.
 - **jq"** Utilitário de linha de comando para processar e formatar JSON, tornando mais fácil a leitura e análise das respostas obtidas com curl.
 
