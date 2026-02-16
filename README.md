@@ -1,18 +1,16 @@
-# Pet Vaccination Control System API
+# Sistema de Vacinação de Pets API
 
-A REST API for managing pet vaccination records, built with Django and Django REST Framework.
+Uma API REST para gerenciar registros de vacinação de pets, usando Django.
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![Django](https://img.shields.io/badge/django-4.2-green.svg)
 ![DRF](https://img.shields.io/badge/DRF-3.14-red.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## 📋 Table of Contents
+## Tabela de Conteúdos
 
 - [Overview](#overview)
 - [Features](#features)
 - [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
 - [Installation](#installation)
   - [Local Setup](#local-setup)
   - [Docker Setup](#docker-setup)
@@ -23,275 +21,131 @@ A REST API for managing pet vaccination records, built with Django and Django RE
 
 ---
 
-## 🎯 Overview
+## Overview
 
-This system allows veterinary clinics and pet owners to track vaccination history, manage pet records, and monitor upcoming vaccination schedules. The API provides complete CRUD operations for pets, vaccines, and vaccination records, with proper authentication and authorization.
+Este sistema permite que clínicas veterinárias e tutores de animais acompanhem o histórico de vacinação, gerenciem os registros dos pets e monitorem os próximos agendamentos de vacinas.
+A API fornece operações completas de CRUD para pets, vacinas e registros de vacinação, com autenticação e autorização.
 
-### Key Capabilities
-
-- **Pet Management**: Register and track pets with detailed information
-- **Vaccine Database**: Maintain a catalog of available vaccines
-- **Vaccination Records**: Record and track all administered vaccinations
-- **Owner Accounts**: Secure user accounts with ownership-based access control
-- **Automated Scheduling**: Automatic calculation of next dose dates
-- **Reminders**: Track due and overdue vaccinations
-
----
-
-## ✨ Features
-
-### Core Features
-- ✅ User registration and authentication (Token-based)
-- ✅ Pet registration with species, breed, age tracking
-- ✅ Vaccine management with duration and mandatory status
-- ✅ Vaccination record keeping with auto-calculated next doses
-- ✅ Owner-based access control (users only see their own data)
-- ✅ Due/overdue vaccination tracking
-- ✅ Comprehensive filtering and search capabilities
-
-### Technical Features
-- ✅ RESTful API design
-- ✅ Token authentication with throttling
-- ✅ Permission-based access control
-- ✅ Automated field validation
-- ✅ Pagination for list endpoints
-- ✅ Comprehensive test coverage (45+ tests)
-- ✅ Docker support for easy deployment
+- **Gerenciamento de Pets**: Cadastre e acompanhe pets com informações detalhadas
+- **Base de Dados de Vacinas**: Mantenha um catálogo de vacinas disponíveis
+- **Registros de Vacinação**: Registre e acompanhe todas as vacinas administradas
+- **Contas de Tutores**: Contas de usuário seguras com controle de acesso baseado em propriedade
+- **Agendamento Automático**: Cálculo automático das datas das próximas doses
+- **Lembretes**: Acompanhe vacinas a vencer e vencidas
 
 ---
 
-## 🛠️ Technology Stack
+
+## Technologias
 
 ### Backend
-- **Python 3.11+**
-- **Django 4.2** - Web framework
-- **Django REST Framework 3.14** - API toolkit
-- **SQLite** - Database (default, easily switchable to PostgreSQL)
+- **Python 3.10.12**
+- **Django 4.2** 
+- **Django REST Framework 3.14**
+- **SQLite**
 
-### Additional Libraries
-- **python-decouple** - Environment variable management
-- **python-dateutil** - Date calculations
+### Bibliotecas Adicionais
+- **python-decouple** - Gerenciamento de variáveis de ambiente
+- **python-dateutil** - Cálculos de datas
 
-### Development Tools
-- **Coverage** - Test coverage reporting
-- **Docker** - Containerization
-
+## Sugestões
+- **curl** para testar os endpoints manualmente
+- **jq"** para facilitar o teste  com curl
 ---
 
-## 📁 Project Structure
-```
-pet-vaccination-api/
-├── pet_vaccination/           # Django project settings
-│   ├── __init__.py
-│   ├── settings.py           # Project configuration
-│   ├── urls.py               # Main URL routing
-│   └── wsgi.py
-│
-├── core/                      # Main application
-│   ├── models/               # Data models
-│   │   ├── owner.py          # Owner model
-│   │   ├── pet.py            # Pet model
-│   │   ├── vaccine.py        # Vaccine model
-│   │   └── vaccination_record.py
-│   │
-│   ├── serializers/          # DRF serializers
-│   │   ├── owner.py
-│   │   ├── pet.py
-│   │   ├── vaccine.py
-│   │   └── vaccination_record.py
-│   │
-│   ├── views/                # API views
-│   │   ├── owner.py          # Owner viewset
-│   │   ├── pet.py            # Pet viewset
-│   │   ├── vaccine.py        # Vaccine viewset
-│   │   ├── vaccination_record.py
-│   │   └── auth.py           # Authentication views
-│   │
-│   ├── tests/                # Test suite
-│   │   ├── test_models.py
-│   │   ├── test_api_auth.py
-│   │   ├── test_api_pets.py
-│   │   ├── test_api_vaccinations.py
-│   │   ├── test_permissions.py
-│   │   └── test_integration.py
-│   │
-│   ├── permissions.py        # Custom permissions
-│   ├── urls.py              # App URL routing
-│   └── admin.py             # Admin interface config
-│
-├── requirements.txt          # Python dependencies
-├── Dockerfile               # Docker image definition
-├── docker-compose.yml       # Docker services orchestration
-├── .env.example             # Environment variables template
-├── .gitignore
-└── manage.py
-```
+## Instalação
 
----
-
-## 🚀 Installation
-
-### Prerequisites
-- Python 3.11 or higher
-- pip (Python package manager)
+### Prerequisitos
+- Python 3.10 ou mais
+- pip
 - Git
 
-### Local Setup
+### Setup Local
 
-#### 1. Clone the Repository
+#### 1. Clone o repositório
 ```bash
-git clone https://github.com/yourusername/pet-vaccination-api.git
-cd pet-vaccination-api
+git clone https://github.com/pedrowsxz/django_sistema_vacinacao_api
+cd django_sistema_vacinacao_api
 ```
 
-#### 2. Create Virtual Environment
+#### 2. Virtual Environment (venv)
 ```bash
-# Create virtual environment
+# Sete o virtual environment
 python -m venv venv
 
-# Activate virtual environment
-# On Windows:
+# Ative o virtual environment
+# Windows:
 venv\Scripts\activate
-# On macOS/Linux:
+# macOS/Linux:
 source venv/bin/activate
 ```
 
-#### 3. Install Dependencies
+#### 3. Instalar Dependências
 ```bash
 pip install -r requirements.txt
 ```
 
-#### 4. Environment Configuration
+#### 4. Configuração do Ambiente
 
-Create `.env` file in the project root:
+Adicione o arquivo `.env` na raiz do projeto a partir do exemplo no repositório:
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your configuration:
+Edite `.env` com a sua configuração:
 ```env
-SECRET_KEY=your-secret-key-here-change-in-production
+SECRET_KEY=sua-chave
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 DATABASE_ENGINE=django.db.backends.sqlite3
 DATABASE_NAME=db.sqlite3
 ```
 
-#### 5. Database Setup
+#### 5. Setup da Database
 ```bash
 # Run migrations
 python manage.py migrate
 
-# Create superuser (admin account)
+# Superuser (conta admin)
 python manage.py createsuperuser
-
-# Load sample data (optional)
-python manage.py loaddata sample_data.json
 ```
 
-#### 6. Run Development Server
+#### 6. Executar o Servidor
 ```bash
 python manage.py runserver
 ```
 
-The API will be available at `http://127.0.0.1:8000/`
+A API estará disponível em `http://127.0.0.1:8000/`
 
 - **API Root**: http://127.0.0.1:8000/api/
 - **Admin Panel**: http://127.0.0.1:8000/admin/
-- **API Documentation**: http://127.0.0.1:8000/api/docs/ (if enabled)
 
 ---
 
-## 🐳 Docker Setup
+## Documentação da API
 
-Docker provides an easy way to run the application without manual setup.
-
-### Prerequisites
-- Docker
-- Docker Compose
-
-### Quick Start with Docker
-
-#### 1. Clone and Navigate
-```bash
-git clone https://github.com/yourusername/pet-vaccination-api.git
-cd pet-vaccination-api
-```
-
-#### 2. Configure Environment
-```bash
-cp .env.example .env
-# Edit .env if needed (default values work for Docker)
-```
-
-#### 3. Build and Run
-```bash
-# Build and start containers
-docker-compose up --build
-
-# Or run in detached mode
-docker-compose up -d
-```
-
-#### 4. Initialize Database
-```bash
-# Run migrations
-docker-compose exec web python manage.py migrate
-
-# Create superuser
-docker-compose exec web python manage.py createsuperuser
-```
-
-#### 5. Access the Application
-
-- **API**: http://localhost:8000/api/
-- **Admin**: http://localhost:8000/admin/
-
-### Docker Commands
-```bash
-# View logs
-docker-compose logs -f
-
-# Stop containers
-docker-compose down
-
-# Stop and remove volumes (database data)
-docker-compose down -v
-
-# Run tests in Docker
-docker-compose exec web python manage.py test
-
-# Access Django shell
-docker-compose exec web python manage.py shell
-```
-
----
-
-## 📚 API Documentation
-
-### Base URL
+###  URL base
 ```
 http://127.0.0.1:8000/api/
 ```
 
-### Authentication
+### Authenticação
 
-All endpoints (except registration and login) require authentication using Token Authentication.
+Todos os endpoints (exceto cadastro e login) exigem autenticação usando Token Authentication.
 
-**Header Format:**
+**Formato do Header:**
 ```
-Authorization: Token <your-token-here>
+Authorization: Token <seu-token>
 ```
 
 ---
 
-### 🔐 Authentication Endpoints
+### Exemplo de flow com os endpoints de Authenticação
+Para isso pode ser usado o curl, ou outra ferramenta de teste de API como Insomnia ou Postman.
 
-#### Register New User
+#### Registre Novo Usuário
 
 **POST** `/api/auth/register/`
-
-Create a new user account with owner profile.
 
 **Request Body:**
 ```json
@@ -326,7 +180,7 @@ Create a new user account with owner profile.
 
 **POST** `/api/auth/login/`
 
-Authenticate and receive access token.
+Autenticação e recebimento do token de acesso.
 
 **Request Body:**
 ```json
@@ -971,61 +825,9 @@ Get comprehensive vaccination summary for all owner's pets.
   ]
 }
 ```
-
 ---
 
-## 🧪 Testing
-
-The project includes a comprehensive test suite covering models, API endpoints, permissions, and integration workflows.
-
-### Run All Tests
-```bash
-# Run all tests
-python manage.py test
-
-# Run with verbosity
-python manage.py test -v 2
-
-# Run specific test file
-python manage.py test core.tests.test_models
-
-# Run specific test class
-python manage.py test core.tests.test_models.PetModelTest
-
-# Run specific test method
-python manage.py test core.tests.test_models.PetModelTest.test_pet_age_calculation
-```
-
-### Test Coverage
-```bash
-# Install coverage
-pip install coverage
-
-# Run tests with coverage
-coverage run --source='core' manage.py test core
-
-# View coverage report
-coverage report
-
-# Generate HTML coverage report
-coverage html
-# Open htmlcov/index.html in browser
-```
-
-### Test Categories
-
-- **Model Tests** (15 tests) - Validation, properties, calculations
-- **Authentication Tests** (8 tests) - Register, login, logout, throttling
-- **Pet API Tests** (10 tests) - CRUD operations, filtering
-- **Vaccination Tests** (8 tests) - Record creation, due dates
-- **Permission Tests** (7 tests) - Access control verification
-- **Integration Tests** (3 tests) - End-to-end workflows
-
-**Total: 45+ tests with ~94% code coverage**
-
----
-
-## 🏗️ Technical Decisions
+## Technical Decisions
 
 ### Architecture Choices
 
@@ -1143,138 +945,3 @@ coverage html
 - No data inconsistency
 - Computed on-demand
 - Included in serializers as read-only
-
-### Testing Strategy
-
-#### 1. Comprehensive Coverage
-**Decision:** Test models, APIs, permissions, and workflows separately.
-
-**Rationale:**
-- Isolates failures
-- Clear test organization
-- Easy to add new tests
-- Documents expected behavior
-
-#### 2. Base Test Classes
-**Decision:** Create base classes with common setup.
-
-**Rationale:**
-- DRY principle
-- Consistent test data
-- Faster test writing
-- Easier maintenance
-
----
-
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `SECRET_KEY` | Django secret key | Required |
-| `DEBUG` | Debug mode | `False` |
-| `ALLOWED_HOSTS` | Allowed hosts | `localhost` |
-| `DATABASE_ENGINE` | Database backend | `django.db.backends.sqlite3` |
-| `DATABASE_NAME` | Database name/path | `db.sqlite3` |
-
-### Switching to PostgreSQL
-
-1. Update `.env`:
-```env
-DATABASE_ENGINE=django.db.backends.postgresql
-DATABASE_NAME=pet_vaccination
-DATABASE_USER=postgres
-DATABASE_PASSWORD=password
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-```
-
-2. Install psycopg2:
-```bash
-pip install psycopg2-binary
-```
-
-3. Update `settings.py`:
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': config('DATABASE_ENGINE'),
-        'NAME': config('DATABASE_NAME'),
-        'USER': config('DATABASE_USER', default=''),
-        'PASSWORD': config('DATABASE_PASSWORD', default=''),
-        'HOST': config('DATABASE_HOST', default=''),
-        'PORT': config('DATABASE_PORT', default=''),
-    }
-}
-```
-
----
-
-## 📈 Future Enhancements
-
-Potential features for future versions:
-
-- [ ] Email notifications for due vaccinations
-- [ ] PDF report generation
-- [ ] Multi-clinic support
-- [ ] Appointment scheduling
-- [ ] Medical history beyond vaccinations
-- [ ] Image uploads for pets
-- [ ] QR code generation for pet profiles
-- [ ] Integration with veterinary management systems
-- [ ] Multi-language support
-- [ ] Mobile app (React Native / Flutter)
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Code Style
-- Follow PEP 8
-- Use meaningful variable names
-- Add docstrings to classes and methods
-- Write tests for new features
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👥 Authors
-
-- **Your Name** - *Initial work* - [GitHub Profile](https://github.com/yourusername)
-
----
-
-## 🙏 Acknowledgments
-
-- Django and Django REST Framework communities
-- All contributors and testers
-
----
-
-## 📞 Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Email: your-email@example.com
-
----
-
-## 📊 Project Status
-
-**Current Version:** 1.0.0  
-**Status:** Production Ready  
-**Last Updated:** January 2024
