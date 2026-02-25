@@ -48,10 +48,10 @@ def register(request):
                 'password': list(e.messages)
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Create pessoa (this also creates user)
+        # Create pessoa (também usuário)
         pessoa = serializer.save()
         
-        # Generate token
+        # Gerar token de autenticação
         token, created = Token.objects.get_or_create(user=pessoa.user)
         
         return Response({
@@ -87,13 +87,13 @@ def login(request):
     username = request.data.get('username')
     password = request.data.get('password')
     
-    # Validate input
+    # Validar o input
     if not username or not password:
         return Response({
             'error': 'Por favor, forneça tanto nome de usuário quanto senha'
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    # Authenticate
+    # Authenticação
     user = authenticate(username=username, password=password)
     
     if not user:
@@ -106,7 +106,7 @@ def login(request):
             'error': 'Conta desativada'
         }, status=status.HTTP_401_UNAUTHORIZED)
     
-    # Get or create token
+    # Get ou criar token de autenticação
     token, created = Token.objects.get_or_create(user=user)
     
     # Get perfil da pessoa se existe
@@ -140,7 +140,7 @@ def logout(request):
     Requer: Header Authorization com o token
     """
     try:
-        # Delete the token
+        # Deletar o token
         request.user.auth_token.delete()
         return Response({
             'message': 'Logout realizado com sucesso'
@@ -206,13 +206,13 @@ def change_password(request):
             'error': 'Por favor, forneça a senha antiga e a nova'
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    # Check old password
+    # Checa a senha antiga
     if not user.check_password(old_password):
         return Response({
             'error': 'Senha antiga está incorreta'
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    # Validate new password
+    # Valida a nova senha
     try:
         validate_password(new_password, user)
     except ValidationError as e:
@@ -220,11 +220,11 @@ def change_password(request):
             'new_password': list(e.messages)
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    # Set new password
+    # Seta a nova senha
     user.set_password(new_password)
     user.save()
     
-    # Delete old token and create new one
+    # Deleta o token antigo e cria um novo
     Token.objects.filter(user=user).delete()
     token = Token.objects.create(user=user)
     

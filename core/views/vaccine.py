@@ -52,7 +52,7 @@ class VaccineViewSet(viewsets.ModelViewSet):
         
         total_administrations = vaccine.vaccination_records.count()
         
-        # GObter estatísticas para uma vacina específica
+        # Obter estatísticas para uma vacina específica
         from django.db.models import Count
         by_species = vaccine.vaccination_records.values(
             'pet__species'
@@ -60,7 +60,7 @@ class VaccineViewSet(viewsets.ModelViewSet):
             count=Count('id')
         ).order_by('-count')
         
-        # Recent administrations (last 30 days)
+        # Administrações recentes (últimos 30 dias)
         from datetime import date, timedelta
         thirty_days_ago = date.today() - timedelta(days=30)
         recent_count = vaccine.vaccination_records.filter(

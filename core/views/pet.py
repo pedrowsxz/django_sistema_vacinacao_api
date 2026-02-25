@@ -53,15 +53,15 @@ class PetViewSet(viewsets.ModelViewSet):
         return queryset
     
     def get_serializer_class(self):
-        """Use detailed serializer for retrieve action"""
+        """Use o DetailSerializer para ação de recuperação"""
         if self.action == 'retrieve':
             return PetDetailSerializer
         return PetSerializer
     
     def perform_create(self, serializer):
         """
-        Automatically set pessoa from authenticated user.
-        For staff users, allow specifying pessoa.
+        Automaticamente define a pessoa do usuário autenticado.
+        Para usuários staff, permitir a especificação de pessoa.
         """
         if not self.request.user.is_staff:
             # Usuários comuns: atribuir automaticamente ao perfil pessoa

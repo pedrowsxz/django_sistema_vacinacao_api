@@ -22,7 +22,6 @@ class PessoaViewSet(viewsets.ModelViewSet):
     update: Atualizar informações da pessoa
     destroy: Deletar conta da pessoa
     """
-    # FIXED: Use IsPessoa for stricter permission control
     permission_classes = [IsAuthenticated, IsPessoa]
     
     def get_queryset(self):
